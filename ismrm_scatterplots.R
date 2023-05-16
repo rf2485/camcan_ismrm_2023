@@ -8,6 +8,8 @@ library(tidyverse)
 library(gridExtra)
 library(ggpmisc)
 library(officer)
+library(psych)
+library(pwr)
 
 ismrm_plots_ppts <- read_pptx()
 layout_summary(ismrm_plots_ppts)
@@ -38,6 +40,12 @@ df$age <- age_mat$X2
 story_d_mat <- read_tsv('glm/story_d_mat.txt', col_names = FALSE)
 df$story_d <- story_d_mat$X2
 
+#power analysis
+effect <- cohen.d(df, 'cohort')[["cohen.d"]]
+#r is the effect size we are guessing based on data in 'effect' variable
+power <- pwr.r.test(n=NULL, r=0.2, sig.level = 0.05, power = 0.8, alternative = "two.sided")
+
+#generate scatterplots
 FA_r_lower_cingulum_scd_story_d <- lm(mean_FA_r_lower_cingulum_mask ~ story_d * cohort, df)
 FA_r_lower_cingulum_scd_story_d_age <- lm(mean_FA_r_lower_cingulum_mask ~ story_d * cohort + age, df)
 anova(FA_r_lower_cingulum_scd_story_d, FA_r_lower_cingulum_scd_story_d_age)
